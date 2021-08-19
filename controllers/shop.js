@@ -2,32 +2,44 @@ const Product = require('../models/product')
 const Cart = require('../models/cart')
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
-    .then(products => {})
-    .catch(e => console.log(e))
+  try {
+    const products = Product.findAll()
+    res.render('shop/product-list', {
+      products: products,
+      pageTitle: 'Listado de Productos',
+      path: '/'
+    })
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 exports.getProduct = (req, res, next) => {
-  const prodId = req.params.productId
-  Product.findByPk(prodId).then(products => {
+  const { productId } = req.params
+  try {
+    const product = Product.findByPk(productId)
+    if (!product) return res.redirect('/')
     res.render('shop/product-detail', {
-      product: products[0],
+      product: product,
       pageTitle: product.title,
       path: '/products'
     })
-  }).catch(e => console.log(e))
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 exports.getIndex = (req, res, next) => {
-  Product.findAll()
-    .then(products => {
-      res.render('shop/index', {
-        prods: products,
-        pageTitle: 'Shop',
-        path: '/'
-      })
+  try {
+    const products = Product.findAll()
+    res.render('shop/index', {
+      prods: products,
+      pageTitle: 'Shop',
+      path: '/'
     })
-    .catch(e => console.log(e))
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 exports.getCart = (req, res, next) => {
@@ -48,7 +60,7 @@ exports.getCart = (req, res, next) => {
 }
 
 exports.postCart = (req, res, next) => {
-  const prodId = req.body.productId
+  const { productId } = req.body
   const newQuantity = 1
   let fetchedCart
   req.user
@@ -63,7 +75,7 @@ exports.postCart = (req, res, next) => {
         const newQty = newProduct.cartItem.qty + newQuantity
         return newProduct
       }
-      return Product.findByPk(prodId)
+      return Product.findByPk(productId)
     })
     .then(product => {
       fetchedCart.addProduct(product, {through: {quantity: newQuantity}})
@@ -75,11 +87,11 @@ exports.postCart = (req, res, next) => {
 }
 
 exports.postCartDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId
+  const { productId } = req.body
   req.user
     .getCart()
     .then(cart => {
-      cart.getProducts({where: {id: prodId}})
+      cart.getProducts({where: {id: productId}})
     })
     .then(products => {
       const product = products[0]
