@@ -8,6 +8,7 @@ exports.getProducts = (req, res) => {
         prods: products,
         pageTitle: 'All Products',
         path: '/products',
+        isAuthenticated: req.isLooggedIn,
       })
     })
     .catch((err) => {
@@ -16,13 +17,14 @@ exports.getProducts = (req, res) => {
 }
 
 exports.getProduct = (req, res) => {
-  const prodId = req.params.productId
-  Product.findById(prodId)
+  const { productId } = req.params
+  Product.findById(productId)
     .then((product) => {
       res.render('shop/product-detail', {
         product,
         pageTitle: product.title,
         path: '/products',
+        isAuthenticated: req.isLooggedIn,
       })
     })
     .catch((err) => console.log(err))
@@ -35,6 +37,7 @@ exports.getIndex = (req, res) => {
         prods: products,
         pageTitle: 'Shop',
         path: '/',
+        isAuthenticated: req.isLooggedIn,
       })
     })
     .catch((err) => {
@@ -52,14 +55,15 @@ exports.getCart = (req, res) => {
         path: '/cart',
         pageTitle: 'Your Cart',
         products,
+        isAuthenticated: req.isLooggedIn,
       })
     })
     .catch((err) => console.log(err))
 }
 
 exports.postCart = (req, res) => {
-  const prodId = req.body.productId
-  Product.findById(prodId)
+  const { productId } = req.body
+  Product.findById(productId)
     .then((product) => req.user.addToCart(product))
     .then((result) => {
       console.log(result)
@@ -68,9 +72,9 @@ exports.postCart = (req, res) => {
 }
 
 exports.postCartDeleteProduct = (req, res) => {
-  const prodId = req.body.productId
+  const { productId } = req.body
   req.user
-    .removeFromCart(prodId)
+    .removeFromCart(productId)
     .then(() => {
       res.redirect('/cart')
     })
@@ -106,6 +110,7 @@ exports.getOrders = (req, res) => {
         path: '/orders',
         pageTitle: 'Your Orders',
         orders,
+        isAuthenticated: req.isLooggedIn,
       })
     })
     .catch((err) => console.log(err))

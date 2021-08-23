@@ -4,6 +4,7 @@ exports.getAddProduct = (req, res) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
+    isAuthenticated: req.isLooggedIn,
     editing: false,
   })
 }
@@ -45,24 +46,23 @@ exports.getEditProduct = (req, res) => {
         path: '/admin/edit-product',
         editing: editMode,
         product,
+        isAuthenticated: req.isLooggedIn,
       })
     })
     .catch((err) => console.log(err))
 }
 
 exports.postEditProduct = (req, res) => {
-  const prodId = req.body.productId
-  const updatedTitle = req.body.title
-  const updatedPrice = req.body.price
-  const updatedImageUrl = req.body.imageUrl
-  const updatedDesc = req.body.description
+  const {
+    productId, title, price, imageUrl, description,
+  } = req.body
 
-  Product.findById(prodId)
+  Product.findById(productId)
     .then((product) => {
-      product.title = updatedTitle
-      product.price = updatedPrice
-      product.description = updatedDesc
-      product.imageUrl = updatedImageUrl
+      product.title = title
+      product.price = price
+      product.description = description
+      product.imageUrl = imageUrl
       return product.save()
     })
     .then(() => {
@@ -78,6 +78,7 @@ exports.getProducts = (req, res) => {
         prods: products,
         pageTitle: 'Admin Products',
         path: '/admin/products',
+        isAuthenticated: req.isLooggedIn,
       })
     })
     .catch((err) => console.log(err))
