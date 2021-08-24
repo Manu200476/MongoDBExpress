@@ -9,3 +9,12 @@ exports.postLogin = (req, res) => {
   req.session.isLoggedIn = true
   res.redirect('/')
 }
+
+exports.logout = (req, res) => {
+  try {
+    req.session.destroy()
+    res.redirect('/')
+  } catch (e) {
+    console.log(e)
+  }
+}
