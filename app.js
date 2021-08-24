@@ -2,8 +2,14 @@ const path = require('path')
 
 const express = require('express')
 const mongoose = require('mongoose')
-
 const session = require('express-session')
+const MongoDBSession = require('connect-mongodb-session')(session)
+
+const store = new MongoDBSession({
+  uri: procces.env.DATABASE_URL,
+  collection: 'sessions',
+})
+
 const errorController = require('./controllers/error')
 const User = require('./models/user')
 
@@ -38,11 +44,12 @@ app.use(session({
   secret: 'vuofj',
   reseave: false,
   saveUninitialized: false,
+  store,
 }))
 
 mongoose
   .connect(
-    'mongodb+srv://manu:<password>@appnodejs.8yjph.mongodb.net/myFirstDatabase?retryWrites=true&w=majorityy',
+    procces.env.DATABASE_URL,
   )
   .then(() => {
     User.findOne().then((user) => {
